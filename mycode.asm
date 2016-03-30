@@ -6,11 +6,9 @@ org 100h
 
 INCLUDE 'emu8086.inc' 
 
-deplasareOriz equ 20
-
+deplasareOriz equ 20 ;declarare constanta
 
 jmp EnterNumber
-
      
 colorScreen PROC ; coloreaza fundalul cu verde
     mov al, 0             
@@ -30,26 +28,33 @@ beep PROC
     int 21h
     ret
 beep ENDP
-      
-
 
 EnterNumber:
     lea SI,msg 
     CALL print_string
+    PUTC 13
+    PUTC 10
+    PRINT "1: Animation"
+    PUTC 13
+    PUTC 10
+    PRINT "2: Move square"
+    PUTC 13
+    PUTC 10
     call scan_num
     PUTC 13
-    PUTC 10 
-    PRINT "You've entered:" 
-    MOV AX, CX 
-    CALL print_Num 
-    PUTC 13 
     PUTC 10
+    PRINT "You've entered:" 
+    PUTC 13
+    PUTC 10
+    MOV AX, CX 
+    CALL print_Num
+    PUTC 13
+    PUTC 10 
     cmp cx, 2
     ja EnterNumber
     jl animation
     je moveSquare
-    
-        
+           
 animation: 
     mov ah, 0h  ;setting video mode
     mov al, 03h ;text mode, 80x25
@@ -60,21 +65,21 @@ animation:
     mov dh, 5
     mov dl, 8
     mov bh, 32 ;changing the color to blue-ish
-    int 10h 
+    int 10h
+     
     josVerticala 1
     josVerticala 2
     josVerticala 3
     josVerticala 4
-    josVerticala 5
+    josVerticala 5 
+    
     spreDreapta 2
     spreDreapta 4
     spreDreapta 6
     spreDreapta 8
     spreDreapta 10
     spreDreapta 12
- 
    
-    
     mov ax, 4c00h
     int 21h   
    
@@ -98,10 +103,7 @@ spreDreapta MACRO p1
     mov bh, 56
     int 10h
 ENDM
-    
-   
        
-   
 moveSquare:     
     mov ah, 0h  ;setting video mode
     mov al, 03h ;text mode, 80x25
@@ -116,7 +118,6 @@ moveSquare:
     mov bh, 56 ;changing the color to white
     int 10h
    
-
 choose:   ;asteapta sa citeasca un caracter de la tastatura
     mov ah, 1
     mov bh, 32
@@ -162,13 +163,12 @@ left:   ;deplasare spre stanga
     call beep
     jmp choose 
      
-
 finish:
    mov ax, 4c00h
    int 21h
     
 HLT
-msg DW 'Enter a number:1 or 2:  ', 0
+msg DB 'Enter a number ', 0
 DEFINE_SCAN_NUM
 DEFINE_PRINT_STRING
 DEFINE_PRINT_NUM
@@ -176,7 +176,3 @@ DEFINE_PRINT_NUM_UNS
  
 
 ret
-
-
-
-
