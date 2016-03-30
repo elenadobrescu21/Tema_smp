@@ -6,31 +6,16 @@ org 100h
 
 INCLUDE 'emu8086.inc' 
 
-deplasareOriz equ 20 
+deplasareOriz equ 20
+
 
 jmp EnterNumber
 
-EnterNumber:
-    lea SI,msg 
-    CALL print_string
-    call scan_num
-    PUTC 13
-    PUTC 10 
-    PRINT "You've entered:" 
-    MOV AX, CX 
-    CALL print_Num 
-    PUTC 13 
-    PUTC 10
-    cmp cx, 4
-    ja EnterNumber
-    jl moveSquare
-    
-    
- 
+     
 colorScreen PROC ; coloreaza fundalul cu verde
     mov al, 0             
     mov ah, 6     
-    mov bh, 32 
+    mov bh, 0ffh 
     mov ch, 0
     mov cl, 0
     mov dh, 25
@@ -45,12 +30,81 @@ beep PROC
     int 21h
     ret
 beep ENDP
+      
 
+
+EnterNumber:
+    lea SI,msg 
+    CALL print_string
+    call scan_num
+    PUTC 13
+    PUTC 10 
+    PRINT "You've entered:" 
+    MOV AX, CX 
+    CALL print_Num 
+    PUTC 13 
+    PUTC 10
+    cmp cx, 2
+    ja EnterNumber
+    jl animation
+    je moveSquare
+    
+        
+animation: 
+    mov ah, 0h  ;setting video mode
+    mov al, 03h ;text mode, 80x25
+    int 10h
+    call colorScreen
+    mov ch, 0
+    mov cl, 0
+    mov dh, 5
+    mov dl, 8
+    mov bh, 32 ;changing the color to blue-ish
+    int 10h 
+    josVerticala 1
+    josVerticala 2
+    josVerticala 3
+    josVerticala 4
+    josVerticala 5
+    spreDreapta 2
+    spreDreapta 4
+    spreDreapta 6
+    spreDreapta 8
+    spreDreapta 10
+    spreDreapta 12
+ 
    
+    
+    mov ax, 4c00h
+    int 21h   
+   
+    
+josVerticala MACRO p1
+    call colorScreen  
+    mov ch, p1
+    mov cl, 0
+    mov dh, 5+p1
+    mov dl, 8
+    mov bh, 32 ;changing the color to blue-ish
+    int 10h
+ENDM  
+
+spreDreapta MACRO p1
+    call colorScreen
+    mov ch, 5
+    mov cl, p1
+    mov dl, 8+p1
+    mov dh, 10
+    mov bh, 56
+    int 10h
+ENDM
+    
+   
+       
    
 moveSquare:     
     mov ah, 0h  ;setting video mode
-    mov al, 03h
+    mov al, 03h ;text mode, 80x25
     int 10h 
     call colorScreen     
     mov ch, 0  ;de unde incep sa desenez patratul
@@ -59,7 +113,7 @@ moveSquare:
     mov dl, 16 
     push cx   ; salvam coordonatele 
     push dx
-    mov bh, 0ffh ;changing the color to white
+    mov bh, 56 ;changing the color to white
     int 10h
    
 
@@ -86,6 +140,7 @@ right:  ;Deplasare spre dreapta
     mov dh, 10
     push cx
     push dx
+    mov bh, 56
     int 10h
     call beep
     jmp choose 
@@ -102,18 +157,18 @@ left:   ;deplasare spre stanga
     mov dh, 10
     push cx
     push dx
+    mov bh, 56
     int 10h
     call beep
     jmp choose 
      
 
 finish:
-    mov ax, 4c00h
-    int 21h
-    
+   mov ax, 4c00h
+   int 21h
     
 HLT
-msg DW 'Enter a number:1, 2, 3 or 4: ', 0
+msg DW 'Enter a number:1 or 2:  ', 0
 DEFINE_SCAN_NUM
 DEFINE_PRINT_STRING
 DEFINE_PRINT_NUM
