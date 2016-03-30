@@ -2,38 +2,68 @@
 ; You may customize this and other start-up templates; 
 ; The location of this template is c:\emu8086\inc\0_com_template.txt
 
-org 100h
+org 100h 
 
+INCLUDE 'emu8086.inc' 
 
-;setting video mode
-mov ah, 0h
-mov al, 03h
-int 10h 
-
-;declarare constante
 deplasareOriz equ 20 
 
+jmp EnterNumber
 
-mov al, 0
-mov ah, 6h
+EnterNumber:
+    lea SI,msg 
+    CALL print_string
+    call scan_num
+    PUTC 13
+    PUTC 10 
+    PRINT "You've entered:" 
+    MOV AX, CX 
+    CALL print_Num 
+    PUTC 13 
+    PUTC 10
+    cmp cx, 4
+    ja EnterNumber
+    jl moveSquare
+    
+    
+ 
+colorScreen PROC ; coloreaza fundalul cu verde
+    mov al, 0             
+    mov ah, 6     
+    mov bh, 32 
+    mov ch, 0
+    mov cl, 0
+    mov dh, 25
+    mov dl, 80 
+    int 10h 
+    ret 
+colorScreen ENDP 
 
-mov bh, 32 ;changing the color to green
-mov ch, 0
-mov cl, 0
-mov dh, 25 ;umple ecranul de 80x25 cu verde
-mov dl, 80  
-int 10h     
+beep PROC 
+    mov ah, 02
+    mov dl, 07h
+    int 21h
+    ret
+beep ENDP
 
-mov ch, 0  ;de unde incep sa desenez patratul
-mov cl, 0
-mov dh, 10 ;dimensiunile patratului
-mov dl, 16 
-push cx   ; salvam coordonatele 
-push dx
-mov bh, 0ffh ;changing the color to white
-int 10h 
+   
+   
+moveSquare:     
+    mov ah, 0h  ;setting video mode
+    mov al, 03h
+    int 10h 
+    call colorScreen     
+    mov ch, 0  ;de unde incep sa desenez patratul
+    mov cl, 0
+    mov dh, 10 ;dimensiunile patratului
+    mov dl, 16 
+    push cx   ; salvam coordonatele 
+    push dx
+    mov bh, 0ffh ;changing the color to white
+    int 10h
+   
 
-choose:      ;asteapta sa citeasca un caracter de la tastatura
+choose:   ;asteapta sa citeasca un caracter de la tastatura
     mov ah, 1
     mov bh, 32
     int 21h
@@ -45,15 +75,7 @@ choose:      ;asteapta sa citeasca un caracter de la tastatura
     je left
 
 right:  ;Deplasare spre dreapta
-    mov al, 0             
-    mov ah, 6 
-    
-    mov bh, 32 
-    mov ch, 0
-    mov cl, 0
-    mov dh, 25
-    mov dl, 80 
-    int 10h 
+    call colorScreen 
 
     mov bh, 0ffh
     mov ch, 0
@@ -65,18 +87,11 @@ right:  ;Deplasare spre dreapta
     push cx
     push dx
     int 10h
+    call beep
     jmp choose 
 
 left:   ;deplasare spre stanga
-    mov al, 0             
-    mov ah, 6 
-    
-    mov bh, 32 
-    mov ch, 0
-    mov cl, 0
-    mov dh, 25
-    mov dl, 80 
-    int 10h
+    call colorScreen
     
     mov bh, 0ffh
     mov ch, 0
@@ -88,12 +103,22 @@ left:   ;deplasare spre stanga
     push cx
     push dx
     int 10h
+    call beep
     jmp choose 
      
 
 finish:
     mov ax, 4c00h
     int 21h
+    
+    
+HLT
+msg DW 'Enter a number:1, 2, 3 or 4: ', 0
+DEFINE_SCAN_NUM
+DEFINE_PRINT_STRING
+DEFINE_PRINT_NUM
+DEFINE_PRINT_NUM_UNS
+ 
 
 ret
 
