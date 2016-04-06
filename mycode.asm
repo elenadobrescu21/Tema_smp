@@ -10,17 +10,28 @@ deplasareOriz equ 20 ;declarare constanta
 
 jmp EnterNumber
      
-colorScreen PROC ; coloreaza fundalul cu verde
+colorScreen PROC ; coloreaza fundalul cu alb
     mov al, 0             
     mov ah, 6     
-    mov bh, 0ffh 
+    mov bh, 0ffh ;cod de culoare pentru alb
     mov ch, 0
     mov cl, 0
     mov dh, 25
     mov dl, 80 
     int 10h 
     ret 
-colorScreen ENDP 
+colorScreen ENDP
+
+clearScreen PROC
+    mov al, 0
+    mov ah, 6    
+    mov ch, 0
+    mov cl, 0
+    mov dh, 25
+    mov dl, 80
+    int 10h
+    jmp EnterNumber
+clearScreen ENDP
 
 beep PROC 
     mov ah, 02
@@ -30,6 +41,15 @@ beep PROC
 beep ENDP
 
 EnterNumber:
+    mov al, 0
+    mov ah, 6    
+    mov ch, 0
+    mov cl, 0 
+    mov bh, 56
+    mov dh, 25
+    mov dl, 80
+    int 10h
+    
     lea SI,msg 
     CALL print_string
     PUTC 13
@@ -72,6 +92,7 @@ animation:
     josVerticala 3
     josVerticala 4
     josVerticala 5 
+      
     
     spreDreapta 2
     spreDreapta 4
@@ -79,9 +100,23 @@ animation:
     spreDreapta 8
     spreDreapta 10
     spreDreapta 12
-   
-    mov ax, 4c00h
-    int 21h   
+    spreDreapta 14
+    spreDreapta 16
+    spreDreapta 18
+    spreDreapta 23
+    spreDreapta 26
+    spreDreapta 29
+    spreDreapta 33
+    spreDreapta 37
+    spreDreapta 42
+    spreDreapta 47
+    spreDreapta 50
+    spreDreapta 55
+    spreDreapta 60
+ 
+    call Beep
+    
+    jmp clearScreen
    
     
 josVerticala MACRO p1
@@ -128,6 +163,9 @@ choose:   ;asteapta sa citeasca un caracter de la tastatura
     je right 
     cmp al, 'a'
     je left
+    cmp al, 'b'
+    je clearScreen
+    
 
 right:  ;Deplasare spre dreapta
     call colorScreen 
@@ -161,8 +199,8 @@ left:   ;deplasare spre stanga
     mov bh, 56
     int 10h
     call beep
-    jmp choose 
-     
+    jmp choose
+         
 finish:
    mov ax, 4c00h
    int 21h
