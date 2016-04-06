@@ -1,7 +1,3 @@
-
-; You may customize this and other start-up templates; 
-; The location of this template is c:\emu8086\inc\0_com_template.txt
-
 org 100h 
 
 INCLUDE 'emu8086.inc' 
@@ -10,19 +6,19 @@ deplasareOriz equ 20 ;declarare constanta
 
 jmp EnterNumber
      
-colorScreen PROC ; coloreaza fundalul cu alb
+colorScreen PROC ;coloreaza fundalul cu alb
     mov al, 0             
     mov ah, 6     
     mov bh, 0ffh ;cod de culoare pentru alb
-    mov ch, 0
+    mov ch, 0    
     mov cl, 0
-    mov dh, 25
+    mov dh, 25   ;coloreaza ecranul de 80x25
     mov dl, 80 
     int 10h 
     ret 
 colorScreen ENDP
 
-clearScreen PROC
+clearScreen PROC ;curata ecranul si sare la meniu
     mov al, 0
     mov ah, 6    
     mov ch, 0
@@ -33,14 +29,14 @@ clearScreen PROC
     jmp EnterNumber
 clearScreen ENDP
 
-beep PROC 
+beep PROC        ;genereaza un beep
     mov ah, 02
     mov dl, 07h
     int 21h
     ret
 beep ENDP
 
-EnterNumber:
+EnterNumber:    ;meniu
     mov al, 0
     mov ah, 6    
     mov ch, 0
@@ -52,7 +48,7 @@ EnterNumber:
     
     lea SI,msg 
     CALL print_string
-    PUTC 13
+    PUTC 13     ;trecere la rand nou
     PUTC 10
     PRINT "1: Animation"
     PUTC 13
@@ -70,21 +66,21 @@ EnterNumber:
     CALL print_Num
     PUTC 13
     PUTC 10 
-    cmp cx, 2
-    ja EnterNumber
+    cmp cx, 2   ;se verifica numarul introdus de la tastatura
+    ja EnterNumber  
     jl animation
     je moveSquare
            
 animation: 
-    mov ah, 0h  ;setting video mode
+    mov ah, 0h  ;setare mod video
     mov al, 03h ;text mode, 80x25
     int 10h
     call colorScreen
     mov ch, 0
     mov cl, 0
-    mov dh, 5
+    mov dh, 5  ;dimensiuni patrat
     mov dl, 8
-    mov bh, 32 ;changing the color to blue-ish
+    mov bh, 32 ;schimba culoarea in cyan
     int 10h
      
     josVerticala 1
@@ -92,8 +88,7 @@ animation:
     josVerticala 3
     josVerticala 4
     josVerticala 5 
-      
-    
+         
     spreDreapta 2
     spreDreapta 4
     spreDreapta 6
@@ -119,17 +114,17 @@ animation:
     jmp clearScreen
    
     
-josVerticala MACRO p1
+josVerticala MACRO p1  ;muta patratul in jos cu nr de randuri specificat prin p1
     call colorScreen  
     mov ch, p1
     mov cl, 0
     mov dh, 5+p1
     mov dl, 8
-    mov bh, 32 ;changing the color to blue-ish
+    mov bh, 32 
     int 10h
 ENDM  
 
-spreDreapta MACRO p1
+spreDreapta MACRO p1   ;muta patratul spre dreapta cu nr de coloane specificat prin p1
     call colorScreen
     mov ch, 5
     mov cl, p1
@@ -140,20 +135,20 @@ spreDreapta MACRO p1
 ENDM
        
 moveSquare:     
-    mov ah, 0h  ;setting video mode
+    mov ah, 0h  ;setare mod video
     mov al, 03h ;text mode, 80x25
     int 10h 
     call colorScreen     
-    mov ch, 0  ;de unde incep sa desenez patratul
+    mov ch, 0   ;de unde incep sa desenez patratul
     mov cl, 0
-    mov dh, 10 ;dimensiunile patratului
+    mov dh, 10  ;dimensiunile patratului
     mov dl, 16 
-    push cx   ; salvam coordonatele 
+    push cx     ;salvam coordonatele pe stiva
     push dx
-    mov bh, 56 ;changing the color to white
+    mov bh, 56 
     int 10h
    
-choose:   ;asteapta sa citeasca un caracter de la tastatura
+choose:         ;asteapta sa citeasca un caracter de la tastatura
     mov ah, 1
     mov bh, 32
     int 21h
@@ -167,9 +162,8 @@ choose:   ;asteapta sa citeasca un caracter de la tastatura
     je clearScreen
     
 
-right:  ;Deplasare spre dreapta
+right:          ;Deplasare spre dreapta
     call colorScreen 
-
     mov bh, 0ffh
     mov ch, 0
     pop dx
@@ -184,9 +178,8 @@ right:  ;Deplasare spre dreapta
     call beep
     jmp choose 
 
-left:   ;deplasare spre stanga
-    call colorScreen
-    
+left:           ;deplasare spre stanga
+    call colorScreen    
     mov bh, 0ffh
     mov ch, 0
     pop dx
@@ -202,8 +195,8 @@ left:   ;deplasare spre stanga
     jmp choose
          
 finish:
-   mov ax, 4c00h
-   int 21h
+    mov ax, 4c00h
+    int 21h
     
 HLT
 msg DB 'Enter a number ', 0
@@ -211,6 +204,5 @@ DEFINE_SCAN_NUM
 DEFINE_PRINT_STRING
 DEFINE_PRINT_NUM
 DEFINE_PRINT_NUM_UNS
- 
 
 ret

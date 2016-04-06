@@ -1,0 +1,13 @@
+Nume: Dobrescu Elena Alexandra
+Grupa: 332AA
+
+Initial se va afisa un meniu din care sunt valabile 2 optiuni:
+-daca se apasa tasta 1 se va afisa o animatie cu un patrat care se misca
+-daca se apasa tasta 2 se va intra intr-un regim interactiv unde userul poate deplasa 
+pe ecran un patrat la stanga sau la dreapta. Pentru deplasare la dreapta se apasa tasta 'd',
+ pentru deplasare la stanga tasta 'a'. De fiecare data cand patratul se deplaseaza se aude un beep.
+Prin apasarea tastei 'e' se va termina programul, iar prin tasta 'b' se va face revenirea la meniu.
+
+Daca se introduce un alt numar in afara de 1 sau 2, se va afisa din nou meniul care cere 
+introducerea unei optiuni.
+
